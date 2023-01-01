@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -20,6 +21,12 @@ public static class BoxUtil
     /// <returns>-1 if aborted, otherwise the amount of files dumped.</returns>
     public static int DumpBoxes(this SaveFile sav, string path, bool boxFolders = false)
     {
+        string pokemon_list = "";
+        pokemon_list += $"National dex,Form, Regional dex,French name,English name, Poke, Beast, Dream, Outside Raids\n";
+
+        string filter = "[";
+        filter += "{\"Name\":\"0atk 0spe ditto\",\"Species\":132,\"Form\":0,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":63,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null},";
+
         if (!sav.HasBox)
             return -1;
 
@@ -48,7 +55,43 @@ public static class BoxUtil
 
             File.WriteAllBytes(fn, pk.DecryptedPartyData);
             ctr++;
+
+            var path_poke = "D:\\Documents\\GitHub\\PokemonDatabase\\SV\\living dex shiny\\poke\\";
+            var files_poke = Directory.EnumerateFiles(path_poke, $"{pk.Species:0000}-{pk.Form:00}*", SearchOption.AllDirectories);
+
+            var path_beast = "D:\\Documents\\GitHub\\PokemonDatabase\\SV\\living dex shiny\\beast\\";
+            var files_beast = Directory.EnumerateFiles(path_beast, $"{pk.Species:0000}-{pk.Form:00}*", SearchOption.AllDirectories);
+
+            var path_dream = "D:\\Documents\\GitHub\\PokemonDatabase\\SV\\living dex shiny\\dream\\";
+            var files_dream = Directory.EnumerateFiles(path_dream, $"{pk.Species:0000}-{pk.Form:00}*", SearchOption.AllDirectories);
+
+            var path_outside_raids = "D:\\Documents\\GitHub\\PokemonDatabase\\SV\\living dex shiny\\outside raids\\";
+            var files_outside_raids = Directory.EnumerateFiles(path_outside_raids, $"{pk.Species:0000}-{pk.Form:00}*", SearchOption.AllDirectories);
+
+            var french_name = SpeciesName.GetSpeciesNameGeneration(pk.Species, (int)LanguageID.French, pk.Format);
+            var english_name = SpeciesName.GetSpeciesNameGeneration(pk.Species, (int)LanguageID.English, pk.Format);
+            pokemon_list += $"{pk.Species:0000},{pk.Form:00},{((PersonalInfo9SV)pk.PersonalInfo).DexIndex},{french_name},{english_name},{files_poke.Any()},{files_beast.Any()},{files_dream.Any()},{files_outside_raids.Count()}\n";
+
+            if (!files_beast.Any() &&
+                !files_dream.Any() &&
+                !files_outside_raids.Any() &&
+                !files_poke.Any())
+            {
+                filter += $"{{\"Name\":\"{french_name} {english_name} shiny\",\"Species\":{pk.Species},\"Form\":{pk.Form},\"Stars\":null,\"StarsComp\":0,\"Shiny\":true,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null}},";
+            }
+            if (files_beast.Count() > 1 ||
+                files_dream.Count() > 1 ||
+                files_poke.Count() > 1)
+            {
+                Debugger.Break();
+            }
         }
+
+        File.WriteAllText("pokemon_list.csv", pokemon_list);
+
+        filter += "]";
+        File.WriteAllText("filters.json", filter);
+
         return ctr;
     }
 

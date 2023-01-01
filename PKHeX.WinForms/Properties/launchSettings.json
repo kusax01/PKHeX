@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PKHeX.WinForms": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\Documents\\GitHub\\PKHeX\\PKHeX.WinForms\\bin\\Release\\net46"
+    }
+  }
+}

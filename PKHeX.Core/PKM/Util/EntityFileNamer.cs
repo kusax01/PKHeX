@@ -1,4 +1,4 @@
-﻿namespace PKHeX.Core;
+namespace PKHeX.Core;
 
 public static class EntityFileNamer
 {
@@ -29,10 +29,24 @@ public sealed class DefaultEntityNamer : IFileNamer<PKM>
 
     private static string GetRegular(PKM pk)
     {
-        string form = pk.Form > 0 ? $"-{pk.Form:00}" : string.Empty;
+        string form = $"-{pk.Form:00}";
         string star = pk.IsShiny ? " ★" : string.Empty;
+        string IV = $"{pk.IV_HP}_{pk.IV_ATK}_{pk.IV_DEF}_{pk.IV_SPA}_{pk.IV_SPD}_{pk.IV_SPE}";
+        string ball = "other";
+        switch (pk.Ball)
+        {
+            case 4:
+                ball = "poke";
+                break;
+            case 25:
+                ball = "dream";
+                break;
+            case 26:
+                ball = "beast";
+                break;
+        }
         var chk = pk is ISanityChecksum s ? s.Checksum : PokeCrypto.GetCHK(pk.Data, pk.SIZE_STORED);
-        return $"{pk.Species:000}{form}{star} - {pk.Nickname} - {chk:X4}{pk.EncryptionConstant:X8}";
+        return $"{pk.Species:0000}{form}{star} - {pk.Nickname} - {IV} - {ball} - {chk:X4}{pk.EncryptionConstant:X8}";
     }
 
     private static string GetGBPKM(GBPKM gb)
