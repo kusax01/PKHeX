@@ -29,9 +29,8 @@ public static class BoxUtil
         string filter = "[";
         //KuSax - Add manual pk filters to filter.json file for raidcrawler
         filter += "{\"Name\":\"0atk 0spe ditto\",\"Species\":132,\"Form\":0,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":63,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null},";
-        //KuSax - always use comma , as separator for pk filter
-        filter += ",";
-        filter += "{\"Name\":\"Herba\",\"Species\":null,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":1073741823,\"Enabled\":true,\"RewardItems\":[1904,1905,1906,1907,1908],\"RewardsComp\":2,\"RewardsCount\":8,\"BatchFilters\":null}";
+        //KuSax - always use comma , as separator for pk filter at the end of file
+        filter += "{\"Name\":\"Herba\",\"Species\":null,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":1073741823,\"Enabled\":true,\"RewardItems\":[1904,1905,1906,1907,1908],\"RewardsComp\":2,\"RewardsCount\":8,\"BatchFilters\":null},";
 
 
 
