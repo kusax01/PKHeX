@@ -21,11 +21,19 @@ public static class BoxUtil
     /// <returns>-1 if aborted, otherwise the amount of files dumped.</returns>
     public static int DumpBoxes(this SaveFile sav, string path, bool boxFolders = false)
     {
+        //KuSax - Header of pokemon_list CSV file - Start of the file 
         string pokemon_list = "";
         pokemon_list += $"National dex,Form, Regional dex,French name,English name, Poke, Beast, Dream, Outside Raids\n";
 
+        //KuSax - Header of filter.json filters for raidcrawler
         string filter = "[";
+        //KuSax - Add manual pk filters to filter.json file for raidcrawler
         filter += "{\"Name\":\"0atk 0spe ditto\",\"Species\":132,\"Form\":0,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":63,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null},";
+        //KuSax - always use comma , as separator for pk filter
+        filter += ",";
+        filter += "{\"Name\":\"Herba\",\"Species\":null,\"Stars\":null,\"StarsComp\":0,\"Shiny\":false,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":1073741823,\"Enabled\":true,\"RewardItems\":[1904,1905,1906,1907,1908],\"RewardsComp\":2,\"RewardsCount\":8,\"BatchFilters\":null}";
+
+
 
         if (!sav.HasBox)
             return -1;
@@ -68,16 +76,22 @@ public static class BoxUtil
             var path_outside_raids = "D:\\Documents\\GitHub\\PokemonDatabase\\SV\\living dex shiny\\outside raids\\";
             var files_outside_raids = Directory.EnumerateFiles(path_outside_raids, $"{pk.Species:0000}-{pk.Form:00}*", SearchOption.AllDirectories);
 
-            var french_name = SpeciesName.GetSpeciesNameGeneration(pk.Species, (int)LanguageID.French, pk.Format);
+            var spanish_name = SpeciesName.GetSpeciesNameGeneration(pk.Species, (int)LanguageID.Spanish, pk.Format);
             var english_name = SpeciesName.GetSpeciesNameGeneration(pk.Species, (int)LanguageID.English, pk.Format);
-            pokemon_list += $"{pk.Species:0000},{pk.Form:00},{((PersonalInfo9SV)pk.PersonalInfo).DexIndex},{french_name},{english_name},{files_poke.Any()},{files_beast.Any()},{files_dream.Any()},{files_outside_raids.Count()}\n";
 
+            //KuSax - trying to add pokedex regional number to raidcrawler json filters
+            //var pokedex_regionalnmb = SpeciesName.GetSpeciesNameGeneration(pk.Gen9 ;//, (int)LanguageID.English, pk.Format);
+
+            //KuSax - add all pokemon to the csv file, marking true/false if exist on pokemon directories
+            pokemon_list += $"{pk.Species:0000},{pk.Form:00},{((PersonalInfo9SV)pk.PersonalInfo).DexIndex},{english_name},{spanish_name},{files_poke.Any()},{files_beast.Any()},{files_dream.Any()},{files_outside_raids.Count()}\n";
+
+            //KuSax - add pokemon not encountered on the directories to the filters.json file
             if (!files_beast.Any() &&
                 !files_dream.Any() &&
                 !files_outside_raids.Any() &&
                 !files_poke.Any())
             {
-                filter += $"{{\"Name\":\"{french_name} {english_name} shiny\",\"Species\":{pk.Species},\"Form\":{pk.Form},\"Stars\":null,\"StarsComp\":0,\"Shiny\":true,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null}},";
+                filter += $"{{\"Name\":\"{english_name} {spanish_name} shiny {((PersonalInfo9SV)pk.PersonalInfo).DexIndex}\",\"Species\":{pk.Species},\"Form\":{pk.Form},\"Stars\":null,\"StarsComp\":0,\"Shiny\":true,\"Nature\":null,\"TeraType\":null,\"Gender\":null,\"IVBin\":0,\"IVComps\":0,\"IVVals\":33553439,\"Enabled\":true,\"RewardItems\":null,\"RewardsComp\":-1,\"RewardsCount\":0,\"BatchFilters\":null}},";
             }
             if (files_beast.Count() > 1 ||
                 files_dream.Count() > 1 ||
@@ -87,8 +101,10 @@ public static class BoxUtil
             }
         }
 
+        //KuSax - finish the csv file
         File.WriteAllText("pokemon_list.csv", pokemon_list);
 
+        //KuSax - finish the filter.json file
         filter += "]";
         File.WriteAllText("filters.json", filter);
 
